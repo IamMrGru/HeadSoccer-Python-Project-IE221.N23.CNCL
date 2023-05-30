@@ -3,14 +3,33 @@ import pymunk
 from pymunk.vec2d import Vec2d
 
 pygame.init()
+pygame.mixer.init()
 win = pygame.display.set_mode((1920,1000))
 pygame.display.set_caption("Demo Ball movement")
 clock=pygame.time.Clock()
 space=pymunk.Space()
 space.gravity=(0,-1000)
-FPS=80
+FPS=64
 size=(1910,1000)
 running=True
+background=pygame.image.load('stadium2.jpg')
+background=pygame.transform.scale(background,size)
+
+ball=pygame.image.load('ball.png')
+ball=pygame.transform.scale(ball,(30*2.8,30*2.8))
+
+p1=pygame.image.load('hien.png')
+p1=pygame.transform.scale(p1,(40*3.2,40*3.2))
+p2=pygame.image.load('ronaldo.png')
+p2=pygame.transform.scale(p2,(40*3.2,40*3.2))
+
+goal=pygame.mixer.Sound('anhkoanmung.wav')
+goal2=pygame.mixer.Sound('goalde.wav')
+siu=pygame.mixer.Sound('siu.wav')
+
+head=pygame.mixer.Sound('ball.wav')
+hitpost=pygame.mixer.Sound('hitpost.wav')
+viva=pygame.mixer.Sound('viva.wav')
 
 #Tạo cặp va chạm
 collision_type_0=0
@@ -18,6 +37,18 @@ collision_type_1 = 1
 collision_type_2 = 2
 collision_type_3 = 3
 
+
+score_player1 = 0
+score_player2 = 0
+max_score = 10
+game_over = False
+
+def update_score():
+    font = pygame.font.Font(None, 200)
+    text2= font.render(f"{score_player2}", True, 'Red')
+    text1 = font.render(f"{score_player1}", True, 'Green')
+    win.blit(text1, (20, 10))
+    win.blit(text2,(1820,10))
 
 # width, height = 1920, 1000
 # mass = 0.1
@@ -32,7 +63,7 @@ collision_type_3 = 3
 # shape.friction=2
 # space.add(body, shape)  
 
-mass = 0.5
+mass = 1
 radius1 = 40
 moment = pymunk.moment_for_circle(mass, 0, radius1,(0,0))
 player = pymunk.Body(mass, moment)
@@ -42,7 +73,7 @@ shape_player .collision_type=collision_type_0
 shape_player .elasticity = 0.4  # Độ đàn hồi khi va chạm với các vật thể khác
 space.add(player, shape_player )
 
-mass = 0.5
+mass = 1
 radius1 = 40
 moment = pymunk.moment_for_circle(mass, 0, radius1,(0,0))
 player2 = pymunk.Body(mass, moment)
@@ -52,7 +83,7 @@ shape_player2 .collision_type=collision_type_0
 shape_player2 .elasticity = 0.4  # Độ đàn hồi khi va chạm với các vật thể khác
 space.add(player2, shape_player2 )
 
-mass = 0.5
+mass = 0.3
 radius2 = 30
 moment = pymunk.moment_for_circle(mass, 0, radius2,(0,0))
 ball1 = pymunk.Body(mass, moment)
@@ -66,14 +97,14 @@ space.add(ball1, shape_ball1)
 # # Tạo đường biên giới bên trái
 left_wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
 left_wall_shape = pymunk.Segment(left_wall_body, (0, 0), (0, 1000),30 )
-left_wall_shape.elasticity=0
+left_wall_shape.elasticity=0.2
 space.add(left_wall_body,left_wall_shape)
 
 # # Tạo đường biên giới bên phải
 
 right_wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
 right_wall_shape = pymunk.Segment(right_wall_body, (1920, 0), (1920, 1000), 27)
-right_wall_shape.elasticity=0
+right_wall_shape.elasticity=0.2
 space.add(right_wall_body,right_wall_shape)
 
 # #Đường ở dưới
@@ -84,13 +115,20 @@ space.add(segment_body,segment_shape)
 
 top_body=pymunk.Body(body_type=pymunk.Body.STATIC)
 top_shape=pymunk.Segment(top_body,(0,1000),(1920,1000),5)
-top_shape.elasticity=1
+top_shape.elasticity=0.5
 space.add(top_body,top_shape)
 
+right_post_body=pymunk.Body(body_type=pymunk.Body.STATIC)
+right_post_shape=pymunk.Segment(right_post_body,(1830,200),(1920,200),5)
+right_post_shape.elasticity=1.2
+space.add(right_post_body,right_post_shape)
 
-
-
+left_post_body=pymunk.Body(body_type=pymunk.Body.STATIC)
+left_post_shape=pymunk.Segment(left_post_body,(0,200),(90,200),5)
+left_post_shape.elasticity=1.2
+space.add(left_post_body,left_post_shape)
 #GOaline
+
 goal_line_body = pymunk.Body(body_type=pymunk.Body.STATIC)
 goal_line_shape = pymunk.Segment(goal_line_body, (1900, 0), (1900, 200),30)
 goal_line_shape.sensor = True  # Đánh dấu shape là sensor
@@ -109,7 +147,7 @@ def goal_reached(arbiter, space, data):
     Ball = arbiter.shapes[0] if arbiter.shapes[0].collision_type != 1 else arbiter.shapes[1]    
     # Kiểm tra nếu đối tượng bóng qua vạch goaline
     if (Ball.body.position.x <1900 and Ball.body.position.y<20):
-        print("Bàn thắng cho đội khách!")
+        return False
     return True
 
 def goal_reached2(arbiter1, space, data):
@@ -117,25 +155,35 @@ def goal_reached2(arbiter1, space, data):
     Ball2 = arbiter1.shapes[0] if arbiter1.shapes[0].collision_type != 1 else arbiter1.shapes[1]    
     # Kiểm tra nếu đối tượng bóng qua vạch goaline
     if (Ball2.body.position.x <10 and Ball2.body.position.y<20):
-        print("Bàn thắng cho đội nhà!")
+        return False
     return True
-
-
+    
 def jump():
     # Kiểm tra xem nhân vật có đang tiếp xúc với mặt phẳng không
     contacts = shape_player.shapes_collide(segment_shape)
-    if contacts:
-        player .apply_impulse_at_local_point((0, 230))  # Áp dụng một lực để nhân vật nhảy lên
+    if  len(contacts.points) !=0:
+        player .apply_impulse_at_local_point((0, 700))  # Áp dụng một lực để nhân vật nhảy lên
 
 def jump1():
     # Kiểm tra xem nhân vật có đang tiếp xúc với mặt phẳng không
     contacts = shape_player2.shapes_collide(segment_shape)
-    if contacts:
-        player2 .apply_impulse_at_local_point((0, 230))  # Áp dụng một lực để nhân vật nhảy lên
+    if len(contacts.points) !=0 :
+        player2 .apply_impulse_at_local_point((0, 700))  # Áp dụng một lực để nhân vật nhảy lên
+def touchball():
+    contacts = shape_player.shapes_collide(shape_ball1)
+    contacts2 = shape_player2.shapes_collide(shape_ball1)
+    if len(contacts.points) !=0  or len(contacts2.points)!=0 :
+        head.play()
+
+def touchpost():
+    contacts = right_post_shape.shapes_collide(shape_ball1)
+    contacts2 = left_post_shape.shapes_collide(shape_ball1)
+    if len(contacts.points) !=0  or len(contacts2.points)!=0 :
+        hitpost.play()
 
 handler = space.add_collision_handler(collision_type_1, collision_type_2)  # Đăng ký bộ xử lý cho cặp collision types
 handler2= space.add_collision_handler(collision_type_1,collision_type_3)
-
+handler3= space.add_collision_handler(collision_type_1,collision_type_0)
 
 handler.begin =goal_reached  
 handler2.begin=goal_reached2
@@ -144,7 +192,9 @@ movement = 0
 movement2=0
 running = True
 
+viva.play(-1)
 while running:
+    pos1 = player.position
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -170,29 +220,66 @@ while running:
                 movement2 = 0
             elif event.key == pygame.K_a and movement2 == -1:
                 movement2 = 0
-
-    win.fill('White')  # Xóa màn hình
-
+    touchball()
+    touchpost()
+    pos=ball1.position
+    if(pos.x<60 and pos.y<167):
+        goal.play()
+        pygame.time.wait(4000)  # Wait for 2 seconds
+        space.remove(ball1, shape_ball1)  # Remove the ball from the space
+        ball1.position = (960, 800)  # Reset the ball's position
+        space.add(ball1, shape_ball1)  # Add the ball back to the space
+        score_player2+=1
+        siu.play()
+    if(pos.x>1863 and pos.y<167):
+        goal2.play()
+        pygame.time.wait(4000)  # Wait for 2 seconds
+        space.remove(ball1, shape_ball1)  # Remove the ball from the space
+        ball1.position = (960, 800)  # Reset the ball's position
+        space.add(ball1, shape_ball1)  # Add the ball back to the space
+        score_player1+=1
+        
+    # if score_player1 >= max_score or score_player2 >= max_score:
+    #     game_over = True
+    #     pygame.time.wait(2000)  # Wait for 2 seconds
+    #     space.remove(ball1, shape_ball1)  # Remove the ball from the space
+    #     ball1.position = (960, 500)  # Reset the ball's position
+    #     space.add(ball1, shape_ball1)  # Add the ball back to the space
+    #     score_player1 = 0  # Reset player 1's score
+    #     score_player2 = 0  # Reset player 2's score
+    #     game_over = False
+    win.blit(background,(0,0))  # Xóa màn hình
+    
     # Cập nhật không gian vật lý
-    dt = 1 / 60.0  # Thời gian giữa các khung hình (60 FPS)
+    dt = 1 / FPS # Thời gian giữa các khung hình (60 FPS)
     space.step(dt)
-    player .velocity = (movement * 350, player .velocity.y)
-    player2 .velocity = (movement2 * 350, player2 .velocity.y)
+    update_score()
+    player .velocity = (movement * 400, player .velocity.y)
+    player2 .velocity = (movement2 * 400, player2 .velocity.y)
     # Vẽ nhân vật
-    pos1 = player .position
     pygame.draw.circle(win,'green',(int(pos1.x),int(size[1]-pos1.y)),radius1)
-    pos2 = player2 .position
+    p1_rect = p1.get_rect(center=(pos1.x, 1000-pos1.y))
+    win.blit(p1, p1_rect)
+
+    pos2 = player2.position
     pygame.draw.circle(win,'red',(int(pos2.x),int(size[1]-pos2.y)),radius1)
+    p2_rect = p2.get_rect(center=(pos2.x, 1000-pos2.y))
+    win.blit(p2, p2_rect)
 
     pygame.draw.line(win,'red',(0, 0), (0, 1000),30)
     pygame.draw.line(win,'red',(1920, 0), (1920, 1000), 30)
-    pygame.draw.line(win,'red', (0,1000),(1920,1000),10)
+
+    pygame.draw.line(win,'white',(1830,800),(1920,800),5)
+    pygame.draw.line(win,'white',(0,800),(90,800),5)
+
     pos=ball1.position
+
+
     pygame.draw.circle(win,'Black',(int(pos.x),int(size[1]-pos.y)),radius2)
-    # pos=body.position
-    # pygame.draw.circle(win, 'blue', (int(pos.x), int(size[1] - pos.y)), radius)
+    ball_rect = ball.get_rect(center=(pos.x, 1000-pos.y))
+    win.blit(ball, ball_rect)
     pygame.display.flip()   
-    clock.tick(60)
+    clock.tick(FPS)
 
 
 
