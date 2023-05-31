@@ -46,7 +46,6 @@ collision_type_3 = 3
 score_player1 = 0
 score_player2 = 0
 max_score = 5
-game_over = False
 
 def update_score():
     font = pygame.font.Font(None, 200)
@@ -63,7 +62,7 @@ player = pymunk.Body(mass, moment)
 player.position = (200,100)
 shape_player  = pymunk.Circle(player, radius1)
 shape_player .collision_type=collision_type_0
-shape_player .elasticity = 0.4  # Độ đàn hồi khi va chạm với các vật thể khác
+shape_player .elasticity = 0.2  # Độ đàn hồi khi va chạm với các vật thể khác
 space.add(player, shape_player )
 
 mass = 1
@@ -73,7 +72,7 @@ player2 = pymunk.Body(mass, moment)
 player2.position = (1720,100)
 shape_player2  = pymunk.Circle(player2, radius1)
 shape_player2 .collision_type=collision_type_0
-shape_player2 .elasticity = 0.4  # Độ đàn hồi khi va chạm với các vật thể khác
+shape_player2 .elasticity = 0.2  # Độ đàn hồi khi va chạm với các vật thể khác
 space.add(player2, shape_player2 )
 
 mass = 0.3
@@ -135,21 +134,21 @@ goal_line2_shape.sensor = True  # Đánh dấu shape là sensor
 goal_line2_shape.collision_type=collision_type_3
 space.add(goal_line2_body,goal_line2_shape)
 
-def goal_reached(arbiter, space, data):
-    # Lấy đối tượng bóng
-    Ball = arbiter.shapes[0] if arbiter.shapes[0].collision_type != 1 else arbiter.shapes[1]    
-    # Kiểm tra nếu đối tượng bóng qua vạch goaline
-    if (Ball.body.position.x <1900 and Ball.body.position.y<20):
-        return False
-    return True
+# def goal_reached(arbiter, space, data):
+#     # Lấy đối tượng bóng
+#     Ball = arbiter.shapes[0] if arbiter.shapes[0].collision_type != 1 else arbiter.shapes[1]    
+#     # Kiểm tra nếu đối tượng bóng qua vạch goaline
+#     if (Ball.body.position.x <1900 and Ball.body.position.y<20):
+#         return False
+#     return True
 
-def goal_reached2(arbiter1, space, data):
-    # Lấy đối tượng bóng
-    Ball2 = arbiter1.shapes[0] if arbiter1.shapes[0].collision_type != 1 else arbiter1.shapes[1]    
-    # Kiểm tra nếu đối tượng bóng qua vạch goaline
-    if (Ball2.body.position.x <10 and Ball2.body.position.y<20):
-        return False
-    return True
+# def goal_reached2(arbiter1, space, data):
+#     # Lấy đối tượng bóng
+#     Ball2 = arbiter1.shapes[0] if arbiter1.shapes[0].collision_type != 1 else arbiter1.shapes[1]    
+#     # Kiểm tra nếu đối tượng bóng qua vạch goaline
+#     if (Ball2.body.position.x <10 and Ball2.body.position.y<20):
+#         return False
+#     return True
     
 def jump():
     # Kiểm tra xem nhân vật có đang tiếp xúc với mặt phẳng không
@@ -162,11 +161,24 @@ def jump1():
     contacts = shape_player2.shapes_collide(segment_shape)
     if len(contacts.points) !=0 :
         player2 .apply_impulse_at_local_point((0, 700))  # Áp dụng một lực để nhân vật nhảy lên
+
+def land():
+    contacts = shape_player.shapes_collide(segment_shape)
+    if  len(contacts.points) ==0:
+        player .apply_impulse_at_local_point((0, -900))
+
+def land1():
+    contacts = shape_player2.shapes_collide(segment_shape)
+    if  len(contacts.points) ==0:
+        player2 .apply_impulse_at_local_point((0, -900))
+
 def touchball():
     contacts = shape_player.shapes_collide(shape_ball1)
     contacts2 = shape_player2.shapes_collide(shape_ball1)
-    if len(contacts.points) !=0  or len(contacts2.points)!=0 :
+    contacts3=shape_ball1.shapes_collide(segment_shape)
+    if len(contacts.points) !=0  or len(contacts2.points)!=0 or len(contacts3.points) !=0 :
         head.play()
+
 
 def touchpost():
     contacts = right_post_shape.shapes_collide(shape_ball1)
@@ -178,8 +190,8 @@ handler = space.add_collision_handler(collision_type_1, collision_type_2)  # Đ�
 handler2= space.add_collision_handler(collision_type_1,collision_type_3)
 handler3= space.add_collision_handler(collision_type_1,collision_type_0)
 
-handler.begin =goal_reached  
-handler2.begin=goal_reached2
+# handler.begin =goal_reached  
+# handler2.begin=goal_reached2
 
 movement = 0
 movement2=0
@@ -205,6 +217,8 @@ random_element = random.choice(music_list)
 music_path = os.path.join('D:\DoanHead\HeadSoccer-Python', random_element)
 pygame.mixer.music.load(music_path)
 pygame.mixer.music.play(-1)
+
+
 game_running='menu'
 while running:
     pos1 = player.position
@@ -412,12 +426,16 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 jump()
+            elif event.key== pygame.K_DOWN:
+                land()
             elif event.key == pygame.K_RIGHT:
                 movement = 1
             elif event.key == pygame.K_LEFT:
                 movement = -1
             elif event.key == pygame.K_w:
                 jump1()
+            elif event.key== pygame.K_s:
+                land1()
             elif event.key == pygame.K_d:
                 movement2 = 1
             elif event.key == pygame.K_a:
