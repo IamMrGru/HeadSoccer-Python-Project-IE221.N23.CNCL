@@ -1,8 +1,13 @@
 # HeadSoccer-Python
 Đồ án môn học Kỹ thuật lập trình Python - IE221.N23.CNCL
+
 **SPECIAL ALERT**
+
 **THIS PROGRAM NEED TO BE INSTALLED WITH PYMUNK,PYGAME**
+
 **pip install pymunk**
+
+
 **pip install pygame**
 
 -	 Bộ điều khiển: Xây dựng hệ thống điều khiển cho game. Người chơi có thể sử dụng các phím mũi tên để di chuyển nhân vật thứ nhất và tổ hợp phím WASD để di chuyển nhân vật thứ 2
