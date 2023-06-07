@@ -14,6 +14,7 @@ paused=False
 
 while running:
     win.blit(background,(0,0))
+    win.blit(ground,(0,929))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running=False

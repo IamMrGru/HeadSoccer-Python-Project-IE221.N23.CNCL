@@ -1,3 +1,13 @@
+"""
+Tên module: PICTURE.py
+
+Mô tả: 
+Thêm các file ảnh vào chương trình
+
+Author: Đoàn Văn Anh Hiển
+Latest Update: 08/06/2003
+
+"""
 import pygame
 import pymunk
 from pymunk.vec2d import Vec2d
@@ -19,3 +29,5 @@ gl=pygame.image.load('goal_l.png')
 gl=pygame.transform.scale(gl,(90,200))
 gr=pygame.image.load('goal_r.png')
 gr=pygame.transform.scale(gr,(90,200))
+ground=pygame.image.load('ground.png')
+ground=pygame.transform.scale(ground,(1920,100))

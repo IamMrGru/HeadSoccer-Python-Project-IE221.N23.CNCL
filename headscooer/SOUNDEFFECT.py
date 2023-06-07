@@ -1,3 +1,13 @@
+"""
+Tên module: SOUNDEFFECT.py
+
+Mô tả: 
+Import các file âm thanh 
+
+Author: Đoàn Văn Anh Hiển
+Latest Update: 08/06/2003
+
+"""
 import pygame
 import pymunk
 from pymunk.vec2d import Vec2d
