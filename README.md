@@ -10,6 +10,8 @@
 
 **pip install pygame**
 
+## Feature
+
 -	 Bộ điều khiển: Xây dựng hệ thống điều khiển cho game. Người chơi có thể sử dụng các phím mũi tên để di chuyển nhân vật thứ nhất và tổ hợp phím WASD để di chuyển nhân vật thứ 2
 
 -	Vật lý: Xử lý các tính toán vật lý như va chạm, chuyển động, và hấp thụ cho các đối tượng trong game. Các thư viện như Pygame hoặc PyMunk cung cấp các công cụ hỗ trợ để xử lý các tính toán vật lý vật lý sau.:
