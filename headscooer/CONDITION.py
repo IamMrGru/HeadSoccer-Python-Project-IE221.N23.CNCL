@@ -11,6 +11,7 @@ collision_type_1=1
 collision_type_2=2
 collision_type_3=3
 
+
 #Boundary
 # # Tạo đường biên giới bên trái
 left_wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
@@ -96,6 +97,8 @@ score_player1 = 0
 score_player2 = 0
 max_score = 5
 
+winner=''
+
 countdown_time = 120  # 2 minutes
 countdown = countdown_time * 1000  # convert to milliseconds
-start_time = pygame.time.get_ticks()
+

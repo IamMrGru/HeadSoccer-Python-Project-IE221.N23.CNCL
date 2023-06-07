@@ -1,8 +1,6 @@
 import pygame
 import pymunk
 from pymunk.vec2d import Vec2d
-import random
-import os
 from .ENV import *
 from .SOUNDEFFECT import *
 from .PICTURE import *
@@ -23,7 +21,7 @@ class Ball:
         if(pos.x<60 and pos.y<167):
             net.play()
             goal.play()
-            pygame.time.wait(4000)  # Wait for 2 seconds
+            pygame.time.wait(2000)  # Wait for 2 seconds
             space.remove(self.ball, self.shape_ball)  # Remove the ball from the space
             self.ball.position = (960, 800)  # Reset the ball's position
             space.add(self.ball, self.shape_ball)  # Add the ball back to the space
@@ -32,7 +30,7 @@ class Ball:
         if(pos.x>1863 and pos.y<167):
             net.play()
             goal2.play()
-            pygame.time.wait(4000)  # Wait for 2 seconds
+            pygame.time.wait(2000)  # Wait for 2 seconds
             space.remove(self.ball, self.shape_ball)  # Remove the ball from the space
             self.ball.position = (960, 800)  # Reset the ball's position
             space.add(self.ball, self.shape_ball)  # Add the ball back to the space
