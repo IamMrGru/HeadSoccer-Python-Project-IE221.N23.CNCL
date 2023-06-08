@@ -4,6 +4,8 @@
 ## LƯU Ý ĐẶC BIỆT
 ### CHƯƠNG TRÌNH NÀY CẦN CÀI ĐẶT CÁC THƯ VIỆN PYMUNK,PYGAME
 
+**Window + R / cmd**
+và nhập:
 **pip install pymunk**
 
 
